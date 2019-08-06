@@ -7,16 +7,19 @@
           closeButton = document.querySelector('.close-lightbox'),
           houseVideo = document.querySelector('.house-video'),
           bannerImages = document.querySelector("#houseImages"),
-          houseName = document.querySelector("#house-name"),
+          houseTitle = document.querySelector("#house-name"),
           houseInfo = document.querySelector(".house-info"),
-          pauseButton = document.querySelector(".fa-pause-circle")
-          playButton = document.querySelector(".fa-play-circle")
+          pauseButton = document.querySelector(".fa-pause-circle"),
+          playButton = document.querySelector(".fa-play-circle"),
+          rewindButton = document.querySelector(".fa-backward");
 
           // houseData is a multidimensional array (arrays within arrays!) Data contianers can hold anything - in this case, each
           // index or entry holds another, smaller container with 2 indexes - 1 with the house name, one with the house data.
           // when you click on the shield, the dataset.offset property is a 0 through 4 that's pointing at the main index of the
           // houseData array (stark, baratheon, lannister etc). so the syntax becomes houseData[0][0] for the house name, and
           // houseData[0][1] for the house data. Each gets assigned to the h1 and the paragraph tag
+
+    let targetHouse = "";
 
     const houseData = [ // houseData[0][0] -> this is the house name ("stark")
         ["stark", `House Stark of Winterfell is a Great House of Westeros,
@@ -75,6 +78,12 @@
           The nominal head of House Arryn is Robin Arryn, the Lord of the Eyrie, with
           his stepfather Petyr Baelish acting as Lord Protector until he reaches the
           age of majority. `],
+
+          ["frey", `House Frey of the Twins was the Great House of the Riverlands, having gained their position for their treachery against their former liege lords, House Tully, who were stripped of all their lands and titles for their rebellion against the Iron Throne; House Tully had supported the independence movement for the Kingdom of the North. The current head of the house is unknown following the assassinations of Lord Walder Frey and two of his sons, Lothar Frey and Walder Rivers, by the vengeful Arya Stark. This is made more complex by the subsequent assassination of all the male Freys soon after.`],
+
+      ["tyrell", `House Tyrell of Highgarden is an extinct Great House of Westeros. It ruled over the Reach, a vast, fertile, and heavily-populated region of southwestern Westeros, from their castle-seat of Highgarden as Lords Paramount of the Reach and Wardens of the South after taking control of the region from House Gardener during the Targaryen conquest.The House was formerly led by Lord Mace Tyrell. Mace's son Loras was a noted tournament knight and, secretly, the lover of Lord Renly Baratheon.`],
+
+      ["targaryen", `House Targaryen of Dragonstone is an exiled Great House of Westeros and the former royal house of the Seven Kingdoms. House Targaryen conquered and unified the realm before it was deposed during Robert's Rebellion and House Baratheon replaced it as the new royal House. The two surviving Targaryens, Viserys and Daenerys, fled into exile to the Free Cities of Essos across the Narrow Sea. House Lannister replaced House Baratheon as the royal House following the destruction of the Great Sept of Baelor, but the realm was reconquered by Daenerys Targaryen, retaking the Iron Throne following the Battle of King's Landing`],
       ];
 
     // pause video on click
@@ -88,6 +97,10 @@
       houseVideo.play();
     }
 
+    function rewindVideo() {
+      houseVideo.currentTime = 0; // rewind the video
+    }
+
     //write the other function for the custom video controls (play, volume, control, time counter, progressbar)
 
     function popLightBox() {
@@ -96,14 +109,9 @@
       //debugger;
       // get the className property, split it into its separate words (an array), and
       //then get the last word --> [1] --> that will always be the house name.
-      let houseName = this.className.split(" ") [1];
-
-      // capitalise the first letter with JavaScript string methods
-      houseName = houseName.charAt(0).toUpperCase() + houseName.slice(1);
-      debugger
 
       // use JavaScript string interpolation to build the path to the target video
-      let videoPath = `video/House-${houseName}.mp4`;
+      let videoPath = `video/House-${targetHouse}.mp4`;
 
       // load this new video videoPath
       houseVideo.src = videoPath;
@@ -133,18 +141,23 @@
       // move the banners to the left using the product of our math
       bannerImages.style.right = `${offset * multiplier + "px"}`;
 
+      let houseName = this.className.split(" ") [1];
+
+      // capitalise the first letter with JavaScript string methods
+      targetHouse = houseName.charAt(0).toUpperCase() + houseName.slice(1);
+
       // change the house nameon the page at the same time
       // houseName.textContent = "House" + houseData[multiplier];
 
       // the multiplier is the outer array index (and also the data-offset custom attribute on the html element
       // -> the shield you're clicking on);
       // the second [] is the INNER array reference (see waaaay up to the top) -> 0 is the house name, 1 is the house data
-      houseName.textContent = `House ${houseData[multiplier][0]}`;
+      houseTitle.textContent = `House ${houseData[multiplier][0]}`;
       houseInfo.textContent = houseData[multiplier][1];
     }
 
-    sigils.forEach(sigil => sigil.addEventListener("click", popLightBox));
-    // sigils.forEach(sigil => sigil.addEventListener("click", animateBanners));
+    //sigils.forEach(sigil => sigil.addEventListener("click", popLightBox));
+    sigils.forEach(sigil => sigil.addEventListener("click", animateBanners));
 
     closeButton.addEventListener("click", closeLightBox);
 
@@ -152,4 +165,8 @@
 
     pauseButton.addEventListener("click", pauseVideo);
     playButton.addEventListener("click", playVideo);
+    rewindButton.addEventListener("click", rewindVideo);
+
+    bannerImages.addEventListener(`transitionend`, popLightBox);
+
 })();
